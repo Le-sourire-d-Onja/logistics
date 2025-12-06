@@ -1,0 +1,10 @@
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/LogisticsApplication.java
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/association/AssociationController.java
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/association/AssociationRepository.java
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/association/AssociationService.java
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/association/dtos/RequestAssociationDto.java
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/association/dtos/ResponseAssociationDto.java
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/association/enums/AssociationType.java
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/association/models/AssociationEntity.java
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/shared/interfaces/OnCreate.java
+/home/cooper/Documents/pro/sourire-onja/inventory-management/backend/src/main/java/com/cooperhost/logistics/shared/interfaces/OnUpdate.java
