@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class WrongUpsertAssociationDto {
+public class WrongCreateAssociationDto {
     private Integer name = 1;
     private AssociationType type = AssociationType.ASSOCIATION;
     private String personInCharge = "test";

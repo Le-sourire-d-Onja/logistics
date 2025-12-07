@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cooperhost.logistics.association.dtos.AssociationDto;
-import com.cooperhost.logistics.association.dtos.UpsertAssociationDto;
+import com.cooperhost.logistics.association.dtos.CreateAssociationDto;
+import com.cooperhost.logistics.association.dtos.UpdateAssociationDto;
 import com.cooperhost.logistics.association.exception.AssociationAlreadyExists;
+import com.cooperhost.logistics.association.exception.AssociationNotFound;
 import com.cooperhost.logistics.association.models.AssociationEntity;
 import com.cooperhost.logistics.association.repositories.AssociationRepository;
 
@@ -31,12 +33,12 @@ public class AssociationService {
   private ModelMapper modelMapper;
 
 
-  public AssociationDto create(UpsertAssociationDto upsertAssociationDto) throws AssociationAlreadyExists {
-    AssociationEntity upsertAssociation = this.modelMapper.map(upsertAssociationDto, AssociationEntity.class);
-    if (associationRepository.existsByName(upsertAssociation.getName())) {
+  public AssociationDto create(CreateAssociationDto createAssociationDto) throws AssociationAlreadyExists {
+    AssociationEntity createAssociation = this.modelMapper.map(createAssociationDto, AssociationEntity.class);
+    if (associationRepository.existsByName(createAssociation.getName())) {
       throw new AssociationAlreadyExists();
     }
-    AssociationEntity association = associationRepository.save(upsertAssociation);
+    AssociationEntity association = associationRepository.save(createAssociation);
     return this.modelMapper.map(association, AssociationDto.class);
   }
 
@@ -47,5 +49,19 @@ public class AssociationService {
       this.modelMapper.map(association, AssociationDto.class)
     ).toList();
   }
+
+  public AssociationDto update(String id, UpdateAssociationDto updateAssociationDto) throws AssociationNotFound {
+    if (!associationRepository.existsById(id)) {
+      throw new AssociationNotFound();
+    }
+    if (associationRepository.existsByName(id)) {
+      throw new AssociationAlreadyExists();
+    }
+    AssociationEntity updateAssociation = this.modelMapper.map(updateAssociationDto, AssociationEntity.class);
+    updateAssociation.setId(id);
+    AssociationEntity association = associationRepository.save(updateAssociation);
+    return this.modelMapper.map(association, AssociationDto.class);
+  }
+
 
 }

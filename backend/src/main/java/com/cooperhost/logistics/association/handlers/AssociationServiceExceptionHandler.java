@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.cooperhost.logistics.association.exception.AssociationAlreadyExists;
+import com.cooperhost.logistics.association.exception.AssociationNotFound;
 import com.cooperhost.logistics.shared.dtos.ErrorDto;
 import com.cooperhost.logistics.shared.models.ApiResponse;
 
@@ -37,5 +38,13 @@ public class AssociationServiceExceptionHandler {
         serviceResponse.setStatus(HttpStatus.CONFLICT);
         serviceResponse.setErrors(Collections.singletonList(new ErrorDto(exception.getMessage(), null)));
         return new ResponseEntity<>(serviceResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(AssociationNotFound.class)
+    public ResponseEntity<?> handleAssociationNotFoundException(AssociationNotFound exception) {
+        ApiResponse<?> serviceResponse = new ApiResponse<>();
+        serviceResponse.setStatus(HttpStatus.NOT_FOUND);
+        serviceResponse.setErrors(Collections.singletonList(new ErrorDto(exception.getMessage(), null)));
+        return new ResponseEntity<>(serviceResponse, HttpStatus.NOT_FOUND);
     }
 }
