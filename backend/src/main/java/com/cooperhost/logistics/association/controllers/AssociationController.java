@@ -5,10 +5,13 @@
 
 package com.cooperhost.logistics.association.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +44,17 @@ public class AssociationController {
       .data(associationDto)
       .build();
     return new ResponseEntity<>(response, HttpStatus.CREATED);
+  }
+
+  @GetMapping()
+  public ResponseEntity<ApiResponse<List<AssociationDto>>> findAll() {
+    List<AssociationDto> associationsDto = this.associationService.findAll();
+    ApiResponse<List<AssociationDto>> response = ApiResponse
+      .<List<AssociationDto>>builder()
+      .status(HttpStatus.OK)
+      .data(associationsDto)
+      .build();
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
 }

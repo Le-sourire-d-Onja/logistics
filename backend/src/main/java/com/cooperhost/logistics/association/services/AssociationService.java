@@ -5,6 +5,8 @@
 
 package com.cooperhost.logistics.association.services;
 
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,14 @@ public class AssociationService {
     }
     AssociationEntity association = associationRepository.save(upsertAssociation);
     return this.modelMapper.map(association, AssociationDto.class);
+  }
+
+
+  public List<AssociationDto> findAll() {
+    List<AssociationEntity> associations = associationRepository.findAll();
+    return associations.stream().map((association) -> 
+      this.modelMapper.map(association, AssociationDto.class)
+    ).toList();
   }
 
 }

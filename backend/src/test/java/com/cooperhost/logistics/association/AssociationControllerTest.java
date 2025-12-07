@@ -5,6 +5,8 @@
 
 package com.cooperhost.logistics.association;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -13,6 +15,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,8 +44,8 @@ public class AssociationControllerTest {
     @MockitoBean
     private AssociationService associationService;
 
-    private final UpsertAssociationDto createAssociationDto = new UpsertAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "0101010101", "test@yopmail.com", "Ceci est une description");
-    private final AssociationDto associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "0101010101", "test@yopmail.com", "Ceci est une description");
+    private final UpsertAssociationDto createAssociationDto = new UpsertAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
+    private final AssociationDto associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
     private final WrongUpsertAssociationDto wrongUpsertAssociationDto = new WrongUpsertAssociationDto();
 
     @Test
@@ -52,14 +56,14 @@ public class AssociationControllerTest {
                         .content(new ObjectMapper().writeValueAsString(createAssociationDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.errors").isEmpty())
-                .andExpect(jsonPath("$.data.id").value("1"))
-                .andExpect(jsonPath("$.data.name").value("Association"))
-                .andExpect(jsonPath("$.data.type").value("ASSOCIATION"))
-                .andExpect(jsonPath("$.data.personInCharge").value("test"))
-                .andExpect(jsonPath("$.data.address").value("1 rue du test"))
-                .andExpect(jsonPath("$.data.email").value("test@yopmail.com"))
-                .andExpect(jsonPath("$.data.phone").value("0101010101"))
-                .andExpect(jsonPath("$.data.description").value("Ceci est une description"));
+                .andExpect(jsonPath("$.data.id").value(associationDto.getId()))
+                .andExpect(jsonPath("$.data.name").value(associationDto.getName()))
+                .andExpect(jsonPath("$.data.type").value(associationDto.getType().toString()))
+                .andExpect(jsonPath("$.data.personInCharge").value(associationDto.getPersonInCharge()))
+                .andExpect(jsonPath("$.data.address").value(associationDto.getAddress()))
+                .andExpect(jsonPath("$.data.email").value(associationDto.getEmail()))
+                .andExpect(jsonPath("$.data.phone").value(associationDto.getPhone()))
+                .andExpect(jsonPath("$.data.description").value(associationDto.getDescription()));
     }
 
     @Test
@@ -85,5 +89,23 @@ public class AssociationControllerTest {
                 .andExpect(jsonPath("$.errors.[0].field").isEmpty())
                 .andExpect(jsonPath("$.errors.[0].message").value("The association already exists"))
                 .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    public void testFindAll_200() throws Exception {
+        when(associationService.findAll()).thenReturn(List.of(associationDto));
+        mockMvc.perform((get("/api/associations"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(createAssociationDto)))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.errors").isEmpty())
+                .andExpect(jsonPath("$.data.[0].id").value(associationDto.getId()))
+                .andExpect(jsonPath("$.data.[0].name").value(associationDto.getName()))
+                .andExpect(jsonPath("$.data.[0].type").value(associationDto.getType().toString()))
+                .andExpect(jsonPath("$.data.[0].personInCharge").value(associationDto.getPersonInCharge()))
+                .andExpect(jsonPath("$.data.[0].address").value(associationDto.getAddress()))
+                .andExpect(jsonPath("$.data.[0].email").value(associationDto.getEmail()))
+                .andExpect(jsonPath("$.data.[0].phone").value(associationDto.getPhone()))
+                .andExpect(jsonPath("$.data.[0].description").value(associationDto.getDescription()));
     }
 }

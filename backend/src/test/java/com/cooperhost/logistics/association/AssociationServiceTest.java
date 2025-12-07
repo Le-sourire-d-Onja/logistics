@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,12 +29,12 @@ public class AssociationServiceTest {
     @MockitoBean
     private AssociationRepository associationRepository;
 
-    private final UpsertAssociationDto createAssociationDto = new UpsertAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "0101010101", "test@yopmail.com", "Ceci est une description");
-    private final AssociationDto associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "0101010101", "test@yopmail.com", "Ceci est une description");
-    private final AssociationEntity association = new AssociationEntity("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "0101010101", "Ceci est une description", Instant.now(), Instant.now());
+    private final UpsertAssociationDto createAssociationDto = new UpsertAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
+    private final AssociationDto associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
+    private final AssociationEntity association = new AssociationEntity("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "+33101010101", "Ceci est une description", Instant.now(), Instant.now());
 
     @Test
-    public void testShouldCreateAnAssociation() {
+    public void testCreate_ShouldCreateAnAssociation() {
         when(associationRepository.existsByName(any(String.class))).thenReturn(false);
         when(associationRepository.save(any(AssociationEntity.class))).thenReturn(association);
         AssociationDto result = associationService.create(createAssociationDto);
@@ -41,8 +42,16 @@ public class AssociationServiceTest {
     }
 
     @Test
-    public void testShouldThrowAssociationAlreadyExists() {
+    @SuppressWarnings("ThrowableResultIgnored")
+    public void testCreate_ShouldThrowAssociationAlreadyExists() {
         when(associationRepository.existsByName(any(String.class))).thenReturn(true);
         assertThrows(AssociationAlreadyExists.class, () -> associationService.create(createAssociationDto));
+    }
+
+    @Test
+    public void testFindAll_ShouldReturnAllData() {
+        when(associationRepository.findAll()).thenReturn(List.of(association));
+        List<AssociationDto> result = associationService.findAll();
+        assertEquals(result, List.of(associationDto));
     }
 }
