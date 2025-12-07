@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,8 +32,17 @@ public class ExceptionServiceExceptionHandler {
         return new ResponseEntity<>(serviceResponse, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+        ApiResponse<?> serviceResponse = new ApiResponse<>();
+        serviceResponse.setStatus(HttpStatus.BAD_REQUEST);
+        serviceResponse.setErrors(Collections.singletonList(new ErrorDto(exception.getMessage(), null)));
+        return new ResponseEntity<>(serviceResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleServiceException(Exception exception) {
+        System.out.println(exception);
         ApiResponse<?> serviceResponse = new ApiResponse<>();
         serviceResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         serviceResponse.setErrors(Collections.singletonList(new ErrorDto(exception.getMessage(), null)));
