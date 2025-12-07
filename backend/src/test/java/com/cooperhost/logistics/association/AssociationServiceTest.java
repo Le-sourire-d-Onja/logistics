@@ -2,6 +2,7 @@ package com.cooperhost.logistics.association;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -91,5 +92,12 @@ public class AssociationServiceTest {
         when(associationRepository.existsById(any(String.class))).thenReturn(true);
         when(associationRepository.existsByName(any(String.class))).thenReturn(true);
         assertThrows(AssociationAlreadyExists.class, () -> associationService.update(associationDto.getId(), updateAssociationDto));
+    }
+
+    @Test
+    @SuppressWarnings("ThrowableResultIgnored")
+    public void testDelete_ShouldThrowAssociatioNotFound() {
+        doThrow(new AssociationNotFound()).when(associationRepository).deleteById(any(String.class));
+        assertThrows(AssociationNotFound.class, () -> associationService.delete(associationDto.getId()));
     }
 }

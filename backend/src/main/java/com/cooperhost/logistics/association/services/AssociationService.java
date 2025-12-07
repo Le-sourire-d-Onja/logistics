@@ -63,5 +63,10 @@ public class AssociationService {
     return this.modelMapper.map(association, AssociationDto.class);
   }
 
-
+  public void delete(String id) {
+    if (!associationRepository.existsById(id)) {
+      throw new AssociationNotFound();
+    }
+    associationRepository.deleteById(id);
+  }
 }

@@ -10,6 +10,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -17,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -109,7 +112,7 @@ public class AssociationControllerTest {
         when(associationService.findAll()).thenReturn(List.of(associationDto));
         mockMvc.perform((get("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").isEmpty())
                 .andExpect(jsonPath("$.data.[0].id").value(associationDto.getId()))
                 .andExpect(jsonPath("$.data.[0].name").value(associationDto.getName()))
@@ -128,7 +131,7 @@ public class AssociationControllerTest {
         mockMvc.perform((patch("/api/associations/" + associationDto.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(updateAssociationDto)))
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").isEmpty())
                 .andExpect(jsonPath("$.data.id").value(associationDto.getId()))
                 .andExpect(jsonPath("$.data.name").value(associationDto.getName()))
@@ -173,5 +176,28 @@ public class AssociationControllerTest {
                 .andExpect(jsonPath("$.errors.[0].field").isEmpty())
                 .andExpect(jsonPath("$.errors.[0].message").value("The association already exists"))
                 .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    public void testDelete_204() throws Exception {
+        doNothing().when(associationService).delete(any(String.class));
+        mockMvc.perform((delete("/api/associations/" + associationDto.getId()))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andExpect(jsonPath("$.errors").isEmpty())
+                .andExpect(jsonPath("$.data").isEmpty());
+
+    }
+
+    @Test
+    public void testDelete_404() throws Exception {
+        doThrow(new AssociationNotFound()).when(associationService).delete(any(String.class));
+        mockMvc.perform((delete("/api/associations/" + associationDto.getId()))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errors.[0].field").isEmpty())
+                .andExpect(jsonPath("$.errors.[0].message").value("The association is not found"))
+                .andExpect(jsonPath("$.data").isEmpty());
+
     }
 }

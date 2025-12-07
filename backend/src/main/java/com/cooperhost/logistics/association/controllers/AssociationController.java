@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,9 +68,23 @@ public class AssociationController {
     AssociationDto associationDto = this.associationService.update(id, updateAssociationDto);
     ApiResponse<AssociationDto> response = ApiResponse
       .<AssociationDto>builder()
-      .status(HttpStatus.CREATED)
+      .status(HttpStatus.OK)
       .data(associationDto)
       .build();
-    return new ResponseEntity<>(response, HttpStatus.CREATED);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<ApiResponse<Void>> delete(
+    @PathVariable("id") String id
+  ) {
+    this.associationService.delete(id);
+    ApiResponse<Void> response = ApiResponse
+      .<Void>builder()
+      .status(HttpStatus.NO_CONTENT)
+      .data(null)
+      .build();
+    return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+  }
+ 
 }
