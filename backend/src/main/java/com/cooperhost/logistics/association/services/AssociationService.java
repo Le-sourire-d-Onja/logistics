@@ -3,7 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 
-package com.cooperhost.logistics.association;
+package com.cooperhost.logistics.association.services;
+
+import org.springframework.stereotype.Service;
 
 import com.cooperhost.logistics.association.dtos.AssociationDto;
 import com.cooperhost.logistics.association.dtos.UpsertAssociationDto;
@@ -12,6 +14,7 @@ import com.cooperhost.logistics.association.dtos.UpsertAssociationDto;
  *
  * @author cooper
  */
+@Service
 public class AssociationService {
 
   public AssociationDto create(UpsertAssociationDto any) {

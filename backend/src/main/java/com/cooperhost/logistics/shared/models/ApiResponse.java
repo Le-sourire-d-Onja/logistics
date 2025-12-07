@@ -18,6 +18,5 @@ import lombok.NoArgsConstructor;
 public class ApiResponse<T> {
     private HttpStatus status;
     private List<ErrorDto> errors;
-    private T results;
-
+    private T data;
 }

@@ -1,4 +1,4 @@
-package com.cooperhost.logistics.association;
+package com.cooperhost.logistics.association.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
