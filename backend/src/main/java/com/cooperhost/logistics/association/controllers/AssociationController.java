@@ -27,15 +27,14 @@ import com.cooperhost.logistics.shared.models.ApiResponse;
  */
 @RestController
 @RequestMapping("/api/associations")
-
 public class AssociationController {
 
   @Autowired
   private AssociationService associationService;
 
-  @PostMapping("/")
+  @PostMapping()
   public ResponseEntity<ApiResponse<AssociationDto>> create(@Validated(OnCreate.class) @RequestBody UpsertAssociationDto upsertAssociationDto) {
-    AssociationDto associationDto = associationService.create(upsertAssociationDto);
+    AssociationDto associationDto = this.associationService.create(upsertAssociationDto);
     ApiResponse<AssociationDto> response = ApiResponse
       .<AssociationDto>builder()
       .status(HttpStatus.CREATED)

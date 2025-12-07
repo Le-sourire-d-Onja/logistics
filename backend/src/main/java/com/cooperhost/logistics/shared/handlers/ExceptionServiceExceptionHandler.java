@@ -16,7 +16,7 @@ public class ExceptionServiceExceptionHandler {
     public ResponseEntity<?> handleServiceException(Exception exception) {
         ApiResponse<?> serviceResponse = new ApiResponse<>();
         serviceResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        serviceResponse.setErrors(Collections.singletonList(new ErrorDto("", exception.getMessage())));
+        serviceResponse.setErrors(Collections.singletonList(new ErrorDto(exception.getMessage(), null)));
         return new ResponseEntity<>(serviceResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

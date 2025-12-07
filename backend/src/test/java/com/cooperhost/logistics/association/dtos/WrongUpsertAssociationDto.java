@@ -20,7 +20,7 @@ public class WrongUpsertAssociationDto {
     private Integer name = 1;
     private AssociationType type = AssociationType.ASSOCIATION;
     private String personInCharge = "test";
-    private String phone = "0101010101";
+    private String phone = "assas10101";
     private String email = "wrong";
     private String description = "Ceci est une description";
 }

@@ -6,6 +6,8 @@ package com.cooperhost.logistics.association.dtos;
 
 import com.cooperhost.logistics.association.enums.AssociationType;
 import com.cooperhost.logistics.shared.interfaces.OnCreate;
+import com.cooperhost.logistics.shared.interfaces.OnUpdate;
+import com.cooperhost.logistics.shared.interfaces.Phone;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -37,10 +39,11 @@ public class UpsertAssociationDto {
     private String address;
 
     @NotNull(groups = OnCreate.class)
+    @Phone(groups = {OnCreate.class, OnUpdate.class})
     private String phone;
 
-    @Email()
     @NotNull(groups = OnCreate.class)
+    @Email(groups = {OnCreate.class, OnUpdate.class})
     private String email;
 
     @NotNull(groups = OnCreate.class)

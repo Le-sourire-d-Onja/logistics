@@ -40,14 +40,14 @@ public class AssociationControllerTest {
     @MockitoBean
     private AssociationService associationService;
 
-    private final UpsertAssociationDto createAssociationDto = new UpsertAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "0101010101", "Ceci est une description");
-    private final AssociationDto associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "0101010101", "Ceci est une description");
+    private final UpsertAssociationDto createAssociationDto = new UpsertAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "0101010101", "test@yopmail.com", "Ceci est une description");
+    private final AssociationDto associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "0101010101", "test@yopmail.com", "Ceci est une description");
     private final WrongUpsertAssociationDto wrongUpsertAssociationDto = new WrongUpsertAssociationDto();
 
     @Test
     public void testCreate_201() throws Exception {
         when(associationService.create(any(UpsertAssociationDto.class))).thenReturn(associationDto);
-        mockMvc.perform((post("/api/associations/"))
+        mockMvc.perform((post("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(createAssociationDto)))
                 .andExpect(status().isCreated())
@@ -65,18 +65,20 @@ public class AssociationControllerTest {
     @Test
     public void testCreate_400() throws Exception {
         // Given a association to create
-        mockMvc.perform((post("/api/associations/"))
+        mockMvc.perform((post("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(wrongUpsertAssociationDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors.[0].field").value("address"))
-                .andExpect(jsonPath("$.errors.[0].message").value("must not be blank"));
+                .andExpect(jsonPath("$.errors").isArray())
+                .andExpect(jsonPath("$.errors[?(@.field == 'address')]").exists())
+                .andExpect(jsonPath("$.errors[?(@.field == 'email')]").exists())
+                .andExpect(jsonPath("$.errors[?(@.field == 'phone')]").exists());
     }
 
     @Test
     public void testCreate_401() throws Exception {
         when(associationService.create(any(UpsertAssociationDto.class))).thenThrow(new AssociationAlreadyExists());
-        mockMvc.perform((post("/api/associations/"))
+        mockMvc.perform((post("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(createAssociationDto)))
                 .andExpect(status().isConflict())

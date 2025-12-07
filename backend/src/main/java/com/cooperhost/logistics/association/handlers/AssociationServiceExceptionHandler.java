@@ -3,6 +3,7 @@ package com.cooperhost.logistics.association.handlers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class AssociationServiceExceptionHandler {
         List<ErrorDto> errors = new ArrayList<>();
         exception.getBindingResult().getFieldErrors()
                 .forEach(error -> {
-                    ErrorDto errorDTO = new ErrorDto(error.getField(), error.getDefaultMessage());
+                    ErrorDto errorDTO = new ErrorDto(error.getDefaultMessage(), Optional.of(error.getField()));
                     errors.add(errorDTO);
                 });
         serviceResponse.setStatus(HttpStatus.BAD_REQUEST);
@@ -34,7 +35,7 @@ public class AssociationServiceExceptionHandler {
     public ResponseEntity<?> handleAssociationAlreadyExistsException(AssociationAlreadyExists exception) {
         ApiResponse<?> serviceResponse = new ApiResponse<>();
         serviceResponse.setStatus(HttpStatus.CONFLICT);
-        serviceResponse.setErrors(Collections.singletonList(new ErrorDto("", exception.getMessage())));
+        serviceResponse.setErrors(Collections.singletonList(new ErrorDto(exception.getMessage(), null)));
         return new ResponseEntity<>(serviceResponse, HttpStatus.CONFLICT);
     }
 }

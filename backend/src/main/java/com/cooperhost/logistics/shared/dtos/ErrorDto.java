@@ -1,5 +1,7 @@
 package com.cooperhost.logistics.shared.dtos;
 
+import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ErrorDto {
-    private String field;
     private String message;
+    private Optional<String> field;
 }
