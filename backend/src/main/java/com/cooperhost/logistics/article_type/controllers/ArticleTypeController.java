@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 
-package com.cooperhost.logistics.association.controllers;
+package com.cooperhost.logistics.article_type.controllers;
 
 import java.util.List;
 
@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cooperhost.logistics.association.dtos.AssociationDto;
-import com.cooperhost.logistics.association.dtos.CreateArticleTypeDto;
-import com.cooperhost.logistics.association.dtos.UpdateAssociationDto;
-import com.cooperhost.logistics.association.services.AssociationService;
+import com.cooperhost.logistics.article_type.dtos.ArticleTypeDto;
+import com.cooperhost.logistics.article_type.dtos.CreateArticleTypeDto;
+import com.cooperhost.logistics.article_type.dtos.UpdateArticleTypeDto;
+import com.cooperhost.logistics.article_type.services.ArticleTypeService;
 import com.cooperhost.logistics.shared.models.ApiResponse;
 
 
@@ -32,53 +32,53 @@ import com.cooperhost.logistics.shared.models.ApiResponse;
  * @author cooper
  */
 @RestController
-@RequestMapping("/api/associations")
-public class AssociationController {
+@RequestMapping("/api/article-types")
+public class ArticleTypeController {
 
   @Autowired
-  private AssociationService associationService;
+  private ArticleTypeService articleTypeService;
 
   @PostMapping()
-  public ResponseEntity<ApiResponse<AssociationDto>> create(@Validated() @RequestBody CreateArticleTypeDto createAssociationDto) {
-    AssociationDto associationDto = this.associationService.create(createAssociationDto);
-    ApiResponse<AssociationDto> response = ApiResponse
-      .<AssociationDto>builder()
+  public ResponseEntity<ApiResponse<ArticleTypeDto>> create(@Validated() @RequestBody CreateArticleTypeDto createArticleTypeDto) {
+    ArticleTypeDto articleTypeDto = this.articleTypeService.create(createArticleTypeDto);
+    ApiResponse<ArticleTypeDto> response = ApiResponse
+      .<ArticleTypeDto>builder()
       .status(HttpStatus.CREATED)
-      .data(associationDto)
+      .data(articleTypeDto)
       .build();
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
   @GetMapping()
-  public ResponseEntity<ApiResponse<List<AssociationDto>>> findAll() {
-    List<AssociationDto> associationsDto = this.associationService.findAll();
-    ApiResponse<List<AssociationDto>> response = ApiResponse
-      .<List<AssociationDto>>builder()
+  public ResponseEntity<ApiResponse<List<ArticleTypeDto>>> findAll() {
+    List<ArticleTypeDto> articleTypesDto = this.articleTypeService.findAll();
+    ApiResponse<List<ArticleTypeDto>> response = ApiResponse
+      .<List<ArticleTypeDto>>builder()
       .status(HttpStatus.OK)
-      .data(associationsDto)
+      .data(articleTypesDto)
       .build();
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<ApiResponse<AssociationDto>> update(
-    @PathVariable("id") String id,
-    @Validated() @RequestBody UpdateAssociationDto updateAssociationDto
+  public ResponseEntity<ApiResponse<ArticleTypeDto>> update(
+    @PathVariable() String id,
+    @Validated() @RequestBody UpdateArticleTypeDto updateArticleTypeDto
   ) {
-    AssociationDto associationDto = this.associationService.update(id, updateAssociationDto);
-    ApiResponse<AssociationDto> response = ApiResponse
-      .<AssociationDto>builder()
+    ArticleTypeDto articleTypeDto = this.articleTypeService.update(id, updateArticleTypeDto);
+    ApiResponse<ArticleTypeDto> response = ApiResponse
+      .<ArticleTypeDto>builder()
       .status(HttpStatus.OK)
-      .data(associationDto)
+      .data(articleTypeDto)
       .build();
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse<Void>> delete(
-    @PathVariable("id") String id
+    @PathVariable() String id
   ) {
-    this.associationService.delete(id);
+    this.articleTypeService.delete(id);
     ApiResponse<Void> response = ApiResponse
       .<Void>builder()
       .status(HttpStatus.NO_CONTENT)
@@ -86,5 +86,4 @@ public class AssociationController {
       .build();
     return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
   }
- 
 }

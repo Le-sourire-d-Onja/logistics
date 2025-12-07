@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.cooperhost.logistics.association.dtos.AssociationDto;
-import com.cooperhost.logistics.association.dtos.CreateAssociationDto;
+import com.cooperhost.logistics.association.dtos.CreateArticleTypeDto;
 import com.cooperhost.logistics.association.dtos.UpdateAssociationDto;
 import com.cooperhost.logistics.association.enums.AssociationType;
 import com.cooperhost.logistics.association.exception.AssociationAlreadyExists;
@@ -33,14 +34,14 @@ public class AssociationServiceTest {
     @MockitoBean
     private AssociationRepository associationRepository;
 
-    private CreateAssociationDto createAssociationDto;
+    private CreateArticleTypeDto createAssociationDto;
     private AssociationDto associationDto;
     private UpdateAssociationDto updateAssociationDto;
     private AssociationEntity association;
 
     @BeforeEach()
-    public void beforeEach() {    
-        createAssociationDto = new CreateAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
+    public void beforeEach() {
+        createAssociationDto = new CreateArticleTypeDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         updateAssociationDto = new UpdateAssociationDto("Association1", null, null, null, null, null, null);
         association = new AssociationEntity("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "+33101010101", "Ceci est une description", Instant.now(), Instant.now());
@@ -72,7 +73,7 @@ public class AssociationServiceTest {
     public void testUpdate_ShouldUpdateAnAssociation() {
         association.setName(updateAssociationDto.getName());
         associationDto.setName(updateAssociationDto.getName());
-        when(associationRepository.existsById(any(String.class))).thenReturn(true);
+        when(associationRepository.findById(any(String.class))).thenReturn(Optional.of(association));
         when(associationRepository.existsByName(any(String.class))).thenReturn(false);
         when(associationRepository.save(any(AssociationEntity.class))).thenReturn(association);
         AssociationDto result = associationService.update(associationDto.getId(), updateAssociationDto);
@@ -82,14 +83,14 @@ public class AssociationServiceTest {
     @Test
     @SuppressWarnings("ThrowableResultIgnored")
     public void testUpdate_ShouldThrowAssociatioNotFound() {
-        when(associationRepository.existsById(any(String.class))).thenReturn(false);
+        when(associationRepository.findById(any(String.class))).thenThrow(new AssociationNotFound());
         assertThrows(AssociationNotFound.class, () -> associationService.update(associationDto.getId(), updateAssociationDto));
     }
 
     @Test
     @SuppressWarnings("ThrowableResultIgnored")
     public void testUpdate_ShouldThrowAssociatioAlreadyExists() {
-        when(associationRepository.existsById(any(String.class))).thenReturn(true);
+        when(associationRepository.findById(any(String.class))).thenReturn(Optional.of(association));
         when(associationRepository.existsByName(any(String.class))).thenReturn(true);
         assertThrows(AssociationAlreadyExists.class, () -> associationService.update(associationDto.getId(), updateAssociationDto));
     }

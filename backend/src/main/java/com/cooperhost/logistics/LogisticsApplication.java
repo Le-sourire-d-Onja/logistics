@@ -9,8 +9,11 @@ import org.springframework.context.annotation.Bean;
 public class LogisticsApplication {
 
 	@Bean
-	public ModelMapper modelMapper() {
-		return new ModelMapper();
+	ModelMapper modelMapper() {
+		ModelMapper mapper = new ModelMapper();
+		mapper.getConfiguration()
+			.setSkipNullEnabled(true);
+		return mapper;
 	}
 
 	public static void main(String[] args) {

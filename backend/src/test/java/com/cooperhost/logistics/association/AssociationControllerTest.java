@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.cooperhost.logistics.association.controllers.AssociationController;
 import com.cooperhost.logistics.association.dtos.AssociationDto;
-import com.cooperhost.logistics.association.dtos.CreateAssociationDto;
+import com.cooperhost.logistics.association.dtos.CreateArticleTypeDto;
 import com.cooperhost.logistics.association.dtos.UpdateAssociationDto;
 import com.cooperhost.logistics.association.dtos.WrongCreateAssociationDto;
 import com.cooperhost.logistics.association.enums.AssociationType;
@@ -51,14 +51,14 @@ public class AssociationControllerTest {
     @MockitoBean
     private AssociationService associationService;
 
-    private CreateAssociationDto createAssociationDto;
+    private CreateArticleTypeDto createAssociationDto;
     private AssociationDto associationDto;
     private UpdateAssociationDto updateAssociationDto;
     private WrongCreateAssociationDto wrongCreateAssociationDto;
 
     @BeforeEach()
     public void beforeEach() {
-        createAssociationDto = new CreateAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
+        createAssociationDto = new CreateArticleTypeDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         updateAssociationDto = new UpdateAssociationDto("Association1", null, null, null, null, null, null);
         wrongCreateAssociationDto =  new WrongCreateAssociationDto();
@@ -66,7 +66,7 @@ public class AssociationControllerTest {
 
     @Test
     public void testCreate_201() throws Exception {
-        when(associationService.create(any(CreateAssociationDto.class))).thenReturn(associationDto);
+        when(associationService.create(any(CreateArticleTypeDto.class))).thenReturn(associationDto);
         mockMvc.perform((post("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(createAssociationDto)))
@@ -97,7 +97,7 @@ public class AssociationControllerTest {
 
     @Test
     public void testCreate_409() throws Exception {
-        when(associationService.create(any(CreateAssociationDto.class))).thenThrow(new AssociationAlreadyExists());
+        when(associationService.create(any(CreateArticleTypeDto.class))).thenThrow(new AssociationAlreadyExists());
         mockMvc.perform((post("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(createAssociationDto)))

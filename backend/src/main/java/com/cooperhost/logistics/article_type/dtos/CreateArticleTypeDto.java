@@ -2,12 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.cooperhost.logistics.association.dtos;
+package com.cooperhost.logistics.article_type.dtos;
 
-import com.cooperhost.logistics.association.enums.AssociationType;
-import com.cooperhost.logistics.shared.interfaces.Phone;
-
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,27 +19,17 @@ import lombok.EqualsAndHashCode;
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode
-public class CreateAssociationDto {
+public class CreateArticleTypeDto {
     @NotBlank()
     private String name;
 
     @NotNull()
-    private AssociationType type;
-
-    @NotBlank()
-    private String personInCharge;
-
-    @NotBlank()
-    private String address;
+    @Min(0)
+    @Max(999)
+    private Float weight;
 
     @NotNull()
-    @Phone()
-    private String phone;
-
-    @NotNull()
-    @Email()
-    private String email;
-
-    @NotNull()
-    private String description;
+    @Min(0)
+    @Max(999)
+    private Float volume;
 }

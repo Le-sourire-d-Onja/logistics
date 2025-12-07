@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cooperhost.logistics.association.dtos.AssociationDto;
-import com.cooperhost.logistics.association.dtos.CreateAssociationDto;
+import com.cooperhost.logistics.association.dtos.CreateArticleTypeDto;
 import com.cooperhost.logistics.association.dtos.UpdateAssociationDto;
 import com.cooperhost.logistics.association.exception.AssociationAlreadyExists;
 import com.cooperhost.logistics.association.exception.AssociationNotFound;
@@ -33,7 +33,7 @@ public class AssociationService {
   private ModelMapper modelMapper;
 
 
-  public AssociationDto create(CreateAssociationDto createAssociationDto) throws AssociationAlreadyExists {
+  public AssociationDto create(CreateArticleTypeDto createAssociationDto) throws AssociationAlreadyExists {
     AssociationEntity createAssociation = this.modelMapper.map(createAssociationDto, AssociationEntity.class);
     if (associationRepository.existsByName(createAssociation.getName())) {
       throw new AssociationAlreadyExists();
@@ -51,15 +51,14 @@ public class AssociationService {
   }
 
   public AssociationDto update(String id, UpdateAssociationDto updateAssociationDto) throws AssociationNotFound {
-    if (!associationRepository.existsById(id)) {
-      throw new AssociationNotFound();
-    }
+    AssociationEntity existing = associationRepository.findById(id)
+      .orElseThrow(AssociationNotFound::new);
     if (associationRepository.existsByName(id)) {
       throw new AssociationAlreadyExists();
     }
-    AssociationEntity updateAssociation = this.modelMapper.map(updateAssociationDto, AssociationEntity.class);
-    updateAssociation.setId(id);
-    AssociationEntity association = associationRepository.save(updateAssociation);
+    this.modelMapper.map(updateAssociationDto, existing);
+    existing.setId(id);
+    AssociationEntity association = associationRepository.save(existing);
     return this.modelMapper.map(association, AssociationDto.class);
   }
 
