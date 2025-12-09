@@ -1,6 +1,7 @@
 package com.cooperhost.logistics.association;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -53,7 +54,7 @@ public class AssociationIntegrationTest extends IntegrationTestConfig {
     public void beforeEach() {
         associationRepository.deleteAll();
         createAssociationDto = new CreateAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
-        associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
+        associationDto = new AssociationDto(UUID.randomUUID().toString(), "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         updateAssociationDto = new UpdateAssociationDto("Association1", null, "test1", "2 rue du test", null, null, null);
         wrongCreateAssociationDto =  new WrongCreateAssociationDto();
         association = new AssociationEntity(null, "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "+33101010101", "Ceci est une description", Instant.now(), Instant.now());
@@ -157,7 +158,7 @@ public class AssociationIntegrationTest extends IntegrationTestConfig {
 
     @Test
     public void testUpdate_409() throws Exception {
-        AssociationEntity associationCopy1 = new AssociationEntity(null, association.getName() + "1", association.getType(), association.getPersonInCharge(), association.getAddress(), association.getEmail(), association.getPhone(), association.getDescription(), association.getCreatedAt(), association.getUpdatedAt());
+        AssociationEntity associationCopy1 = new AssociationEntity(null, association.getName() + UUID.randomUUID().toString(), association.getType(), association.getPersonInCharge(), association.getAddress(), association.getEmail(), association.getPhone(), association.getDescription(), association.getCreatedAt(), association.getUpdatedAt());
         AssociationEntity associationCopy2 = new AssociationEntity(null, association.getName(), association.getType(), association.getPersonInCharge(), association.getAddress(), association.getEmail(), association.getPhone(), association.getDescription(), association.getCreatedAt(), association.getUpdatedAt());
 
         associationRepository.save(associationCopy1);

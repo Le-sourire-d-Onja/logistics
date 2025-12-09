@@ -11,8 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cooperhost.logistics.donation.dtos.CreateDonationDto;
 import com.cooperhost.logistics.donation.dtos.DonationDto;
-import com.cooperhost.logistics.donation.dtos.CreateDonationTypeDto;
 import com.cooperhost.logistics.donation.dtos.UpdateDonationDto;
 import com.cooperhost.logistics.donation.exception.DonationAlreadyExists;
 import com.cooperhost.logistics.donation.exception.DonationNotFound;
@@ -33,7 +33,7 @@ public class DonationService {
   private ModelMapper modelMapper;
 
 
-  public DonationDto create(CreateDonationTypeDto createDonationDto) throws DonationAlreadyExists {
+  public DonationDto create(CreateDonationDto createDonationDto) throws DonationAlreadyExists {
     DonationEntity createDonation = this.modelMapper.map(createDonationDto, DonationEntity.class);
     DonationEntity donation = donationRepository.save(createDonation);
     return this.modelMapper.map(donation, DonationDto.class);

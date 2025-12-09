@@ -1,5 +1,7 @@
 package com.cooperhost.logistics.article_type;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -50,7 +52,7 @@ public class ArticleTypeIntegrationTest extends IntegrationTestConfig {
     public void beforeEach() {
         articleTypeRepository.deleteAll();
         createArticleTypeDto = new CreateArticleTypeDto("ArticleType", 10f, 10f);
-        articleTypeDto = new ArticleTypeDto("1", "ArticleType", 10f, 10f);
+        articleTypeDto = new ArticleTypeDto(UUID.randomUUID().toString(), "ArticleType", 10f, 10f);
         updateArticleTypeDto = new UpdateArticleTypeDto("ArticleType1", null, null);
         wrongCreateArticleTypeDto =  new WrongCreateArticleTypeDto();
         articleType = new ArticleTypeEntity(null, "ArticleType", 10f, 10f);
@@ -140,7 +142,7 @@ public class ArticleTypeIntegrationTest extends IntegrationTestConfig {
 
     @Test
     public void testUpdate_409() throws Exception {
-        ArticleTypeEntity articleTypeCopy1 = new ArticleTypeEntity(null, articleType.getName() + "1", articleType.getWeight(), articleType.getVolume());
+        ArticleTypeEntity articleTypeCopy1 = new ArticleTypeEntity(null, articleType.getName() + UUID.randomUUID().toString(), articleType.getWeight(), articleType.getVolume());
         ArticleTypeEntity articleTypeCopy2 = new ArticleTypeEntity(null, articleType.getName(), articleType.getWeight(), articleType.getVolume());
 
         articleTypeRepository.save(articleTypeCopy1);

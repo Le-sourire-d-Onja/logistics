@@ -2,6 +2,7 @@ package com.cooperhost.logistics.article_type;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,9 +41,9 @@ public class ArticleTypeServiceUnitTest {
     @BeforeEach()
     public void beforeEach() {
         createArticleTypeDto = new CreateArticleTypeDto("ArticleType", 10f, 10f);
-        articleTypeDto = new ArticleTypeDto("1", "ArticleType", 10f, 10f);
+        articleTypeDto = new ArticleTypeDto(UUID.randomUUID().toString(), "ArticleType", 10f, 10f);
         updateArticleTypeDto = new UpdateArticleTypeDto("ArticleType1", null, null);
-        articleType = new ArticleTypeEntity("1", "ArticleType", 10f, 10f);
+        articleType = new ArticleTypeEntity(UUID.randomUUID().toString(), "ArticleType", 10f, 10f);
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.cooperhost.logistics.donation;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,7 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.cooperhost.logistics.article_type.dtos.ArticleTypeDto;
 import com.cooperhost.logistics.article_type.models.ArticleTypeEntity;
 import com.cooperhost.logistics.donation.dtos.ArticleDto;
-import com.cooperhost.logistics.donation.dtos.CreateDonationTypeDto;
+import com.cooperhost.logistics.donation.dtos.CreateDonationDto;
 import com.cooperhost.logistics.donation.dtos.DonationDto;
 import com.cooperhost.logistics.donation.dtos.UpdateDonationDto;
 import com.cooperhost.logistics.donation.dtos.UpsertArticleDto;
@@ -36,7 +37,7 @@ public class DonationServiceUnitTest {
     @MockitoBean
     private DonationRepository donationRepository;
 
-    private CreateDonationTypeDto createDonationDto;
+    private CreateDonationDto createDonationDto;
     private DonationDto donationDto;
     private UpdateDonationDto updateDonationDtoWithoutArticles;
     private UpdateDonationDto updateDonationDtoWithArticles;
@@ -44,11 +45,11 @@ public class DonationServiceUnitTest {
 
     @BeforeEach()
     public void beforeEach() {
-        createDonationDto = new CreateDonationTypeDto("Donation", List.of(new UpsertArticleDto(null, "1", 10)));
-        donationDto = new DonationDto("1", "Donation", List.of(new ArticleDto("1", new ArticleTypeDto("1", "ArticleType", 10f, 10f), 10)));
+        createDonationDto = new CreateDonationDto("Donation", List.of(new UpsertArticleDto(null, UUID.randomUUID().toString(), 10)));
+        donationDto = new DonationDto(UUID.randomUUID().toString(), "Donation", List.of(new ArticleDto(UUID.randomUUID().toString(), new ArticleTypeDto(UUID.randomUUID().toString(), "ArticleType", 10f, 10f), 10)));
         updateDonationDtoWithoutArticles = new UpdateDonationDto("Donation1", null);
-        updateDonationDtoWithArticles = new UpdateDonationDto("Donation1", List.of(new UpsertArticleDto(null, "1", 10)));
-        donation = new DonationEntity("1", "Donation", Instant.now(), Instant.now(), List.of(new ArticleEntity("1", new ArticleTypeEntity("1", "ArticleType", 10f, 10f), 10)));
+        updateDonationDtoWithArticles = new UpdateDonationDto("Donation1", List.of(new UpsertArticleDto(null, UUID.randomUUID().toString(), 10)));
+        donation = new DonationEntity(UUID.randomUUID().toString(), "Donation", Instant.now(), Instant.now(), List.of(new ArticleEntity(UUID.randomUUID().toString(), new ArticleTypeEntity(UUID.randomUUID().toString(), "ArticleType", 10f, 10f), 10)));
     }
 
     // -- Unit tests --
@@ -78,7 +79,7 @@ public class DonationServiceUnitTest {
     @Test
     public void testUpdate_ShouldUpdateADonationWithArticles() {
         donationDto.setDescription(updateDonationDtoWithArticles.getDescription());
-        donationDto.setArticles(List.of(new ArticleDto("1", new ArticleTypeDto(updateDonationDtoWithArticles.getArticles().get(0).getTypeId(), "ArticleType", 10f, 10f), updateDonationDtoWithArticles.getArticles().get(0).getQuantity())));
+        donationDto.setArticles(List.of(new ArticleDto(UUID.randomUUID().toString(), new ArticleTypeDto(updateDonationDtoWithArticles.getArticles().get(0).getTypeId(), "ArticleType", 10f, 10f), updateDonationDtoWithArticles.getArticles().get(0).getQuantity())));
         when(donationRepository.findById(any(String.class))).thenReturn(Optional.of(donation));
         when(donationRepository.save(any(DonationEntity.class))).thenReturn(donation);
         DonationDto result = donationService.update(donationDto.getId(), updateDonationDtoWithArticles);

@@ -6,6 +6,7 @@
 package com.cooperhost.logistics.association;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ public class AssociationControllerTest {
     @BeforeEach()
     public void beforeEach() {
         createAssociationDto = new CreateAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
-        associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
+        associationDto = new AssociationDto(UUID.randomUUID().toString(), "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         updateAssociationDto = new UpdateAssociationDto("Association1", null, null, null, null, null, null);
         wrongCreateAssociationDto =  new WrongCreateAssociationDto();
     }

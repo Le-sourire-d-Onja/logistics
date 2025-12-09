@@ -20,7 +20,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode
-public class CreateDonationTypeDto {
+public class CreateDonationDto {
     @NotNull()
     String description;
 

@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cooperhost.logistics.donation.dtos.CreateDonationDto;
 import com.cooperhost.logistics.donation.dtos.DonationDto;
-import com.cooperhost.logistics.donation.dtos.CreateDonationTypeDto;
 import com.cooperhost.logistics.donation.dtos.UpdateDonationDto;
 import com.cooperhost.logistics.donation.services.DonationService;
 import com.cooperhost.logistics.shared.models.ApiResponse;
@@ -39,7 +39,7 @@ public class DonationController {
   private DonationService donationService;
 
   @PostMapping()
-  public ResponseEntity<ApiResponse<DonationDto>> create(@Validated() @RequestBody CreateDonationTypeDto createDonationDto) {
+  public ResponseEntity<ApiResponse<DonationDto>> create(@Validated() @RequestBody CreateDonationDto createDonationDto) {
     DonationDto donationDto = this.donationService.create(createDonationDto);
     ApiResponse<DonationDto> response = ApiResponse
       .<DonationDto>builder()

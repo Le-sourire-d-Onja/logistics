@@ -3,6 +3,7 @@ package com.cooperhost.logistics.association;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,9 +42,9 @@ public class AssociationServiceUnitTest {
     @BeforeEach()
     public void beforeEach() {
         createAssociationDto = new CreateAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
-        associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
+        associationDto = new AssociationDto(UUID.randomUUID().toString(), "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         updateAssociationDto = new UpdateAssociationDto("Association1", null, null, null, null, null, null);
-        association = new AssociationEntity("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "+33101010101", "Ceci est une description", Instant.now(), Instant.now());
+        association = new AssociationEntity(UUID.randomUUID().toString(), "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "+33101010101", "Ceci est une description", Instant.now(), Instant.now());
     }
 
     @Test

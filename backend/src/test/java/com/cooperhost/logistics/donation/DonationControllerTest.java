@@ -6,6 +6,7 @@
 package com.cooperhost.logistics.donation;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,16 +19,18 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.cooperhost.logistics.article_type.dtos.ArticleTypeDto;
 import com.cooperhost.logistics.donation.controllers.DonationController;
-import com.cooperhost.logistics.donation.dtos.DonationDto;
 import com.cooperhost.logistics.donation.dtos.ArticleDto;
-import com.cooperhost.logistics.donation.dtos.CreateDonationTypeDto;
+import com.cooperhost.logistics.donation.dtos.CreateDonationDto;
+import com.cooperhost.logistics.donation.dtos.DonationDto;
 import com.cooperhost.logistics.donation.dtos.UpdateDonationDto;
 import com.cooperhost.logistics.donation.dtos.UpsertArticleDto;
 import com.cooperhost.logistics.donation.dtos.WrongCreateDonationDto;
@@ -49,7 +52,7 @@ public class DonationControllerTest {
     @MockitoBean
     private DonationService donationService;
 
-    private CreateDonationTypeDto createDonationDto;
+    private CreateDonationDto createDonationDto;
     private DonationDto donationDto;
     private UpdateDonationDto updateDonationDtoWithoutArticles;
     private UpdateDonationDto updateDonationDtoWithArticles;
@@ -57,16 +60,16 @@ public class DonationControllerTest {
 
     @BeforeEach()
     public void beforeEach() {
-        createDonationDto = new CreateDonationTypeDto("Donation", List.of(new UpsertArticleDto(null, "1", 10)));
-        donationDto = new DonationDto("1", "Donation", List.of(new ArticleDto("1", new ArticleTypeDto("1", "ArticleType", 10f, 10f), 10)));
+        createDonationDto = new CreateDonationDto("Donation", List.of(new UpsertArticleDto(null, UUID.randomUUID().toString(), 10)));
+        donationDto = new DonationDto(UUID.randomUUID().toString(), "Donation", List.of(new ArticleDto(UUID.randomUUID().toString(), new ArticleTypeDto(UUID.randomUUID().toString(), "ArticleType", 10f, 10f), 10)));
         updateDonationDtoWithoutArticles = new UpdateDonationDto("Donation1", null);
-        updateDonationDtoWithArticles = new UpdateDonationDto("Donation1", List.of(new UpsertArticleDto(null, "1", 20), new UpsertArticleDto("1", "2", 20)));
+        updateDonationDtoWithArticles = new UpdateDonationDto("Donation1", List.of(new UpsertArticleDto(null, UUID.randomUUID().toString(), 20), new UpsertArticleDto(UUID.randomUUID().toString(), "2", 20)));
         wrongCreateDonationDto =  new WrongCreateDonationDto();
     }
 
     @Test
     public void testCreate_201() throws Exception {
-        when(donationService.create(any(CreateDonationTypeDto.class))).thenReturn(donationDto);
+        when(donationService.create(any(CreateDonationDto.class))).thenReturn(donationDto);
         mockMvc.perform((post("/api/donations"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(createDonationDto)))
@@ -131,7 +134,7 @@ public class DonationControllerTest {
     @Test
     public void testUpdate_WithArticles200() throws Exception {
         donationDto.setDescription(updateDonationDtoWithArticles.getDescription());
-        donationDto.setArticles(List.of(new ArticleDto("1", new ArticleTypeDto(updateDonationDtoWithArticles.getArticles().get(0).getTypeId(), "ArticleType", 10f, 10f), updateDonationDtoWithArticles.getArticles().get(0).getQuantity())));
+        donationDto.setArticles(List.of(new ArticleDto(UUID.randomUUID().toString(), new ArticleTypeDto(updateDonationDtoWithArticles.getArticles().get(0).getTypeId(), "ArticleType", 10f, 10f), updateDonationDtoWithArticles.getArticles().get(0).getQuantity())));
         when(donationService.update(any(String.class), any(UpdateDonationDto.class))).thenReturn(donationDto);
         mockMvc.perform((patch("/api/donations/" + donationDto.getId()))
                         .contentType(MediaType.APPLICATION_JSON)

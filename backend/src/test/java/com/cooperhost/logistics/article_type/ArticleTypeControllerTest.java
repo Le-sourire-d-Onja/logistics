@@ -6,6 +6,7 @@
 package com.cooperhost.logistics.article_type;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ public class ArticleTypeControllerTest {
     @BeforeEach()
     public void beforeEach() {
         createArticleTypeDto = new CreateArticleTypeDto("ArticleType", 10f, 10f);
-        articleTypeDto = new ArticleTypeDto("1", "ArticleType", 10f, 10f);
+        articleTypeDto = new ArticleTypeDto(UUID.randomUUID().toString(), "ArticleType", 10f, 10f);
         updateArticleTypeDto = new UpdateArticleTypeDto("ArticleType1", null, null);
         wrongCreateArticleTypeDto =  new WrongCreateArticleTypeDto();
     }
