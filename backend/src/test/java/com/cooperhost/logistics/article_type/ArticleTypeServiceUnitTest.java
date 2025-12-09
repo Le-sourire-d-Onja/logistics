@@ -14,17 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.cooperhost.logistics.article_type.exception.ArticleTypeNotFound;
 import com.cooperhost.logistics.article_type.dtos.ArticleTypeDto;
 import com.cooperhost.logistics.article_type.dtos.CreateArticleTypeDto;
 import com.cooperhost.logistics.article_type.dtos.UpdateArticleTypeDto;
 import com.cooperhost.logistics.article_type.exception.ArticleTypeAlreadyExists;
+import com.cooperhost.logistics.article_type.exception.ArticleTypeNotFound;
 import com.cooperhost.logistics.article_type.models.ArticleTypeEntity;
 import com.cooperhost.logistics.article_type.repositories.ArticleTypeRepository;
 import com.cooperhost.logistics.article_type.services.ArticleTypeService;
 
 @WebMvcTest(ArticleTypeService.class)
-public class ArticleTypeServiceTest {
+public class ArticleTypeServiceUnitTest {
     @Autowired
     private ArticleTypeService articleTypeService;
 

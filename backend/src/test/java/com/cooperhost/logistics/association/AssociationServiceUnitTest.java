@@ -1,17 +1,16 @@
 package com.cooperhost.logistics.association;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -27,7 +26,7 @@ import com.cooperhost.logistics.association.repositories.AssociationRepository;
 import com.cooperhost.logistics.association.services.AssociationService;
 
 @WebMvcTest(AssociationService.class)
-public class AssociationServiceTest {
+public class AssociationServiceUnitTest {
     @Autowired
     private AssociationService associationService;
 
