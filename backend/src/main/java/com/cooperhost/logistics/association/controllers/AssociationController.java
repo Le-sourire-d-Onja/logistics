@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cooperhost.logistics.association.dtos.AssociationDto;
-import com.cooperhost.logistics.association.dtos.CreateArticleTypeDto;
+import com.cooperhost.logistics.association.dtos.CreateAssociationDto;
 import com.cooperhost.logistics.association.dtos.UpdateAssociationDto;
 import com.cooperhost.logistics.association.services.AssociationService;
 import com.cooperhost.logistics.shared.models.ApiResponse;
@@ -39,7 +39,7 @@ public class AssociationController {
   private AssociationService associationService;
 
   @PostMapping()
-  public ResponseEntity<ApiResponse<AssociationDto>> create(@Validated() @RequestBody CreateArticleTypeDto createAssociationDto) {
+  public ResponseEntity<ApiResponse<AssociationDto>> create(@Validated() @RequestBody CreateAssociationDto createAssociationDto) {
     AssociationDto associationDto = this.associationService.create(createAssociationDto);
     ApiResponse<AssociationDto> response = ApiResponse
       .<AssociationDto>builder()

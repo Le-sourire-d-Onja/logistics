@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode
-public class CreateArticleTypeDto {
+public class CreateAssociationDto {
     @NotBlank()
     private String name;
 

@@ -16,7 +16,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.cooperhost.logistics.association.dtos.AssociationDto;
-import com.cooperhost.logistics.association.dtos.CreateArticleTypeDto;
+import com.cooperhost.logistics.association.dtos.CreateAssociationDto;
 import com.cooperhost.logistics.association.dtos.UpdateAssociationDto;
 import com.cooperhost.logistics.association.enums.AssociationType;
 import com.cooperhost.logistics.association.exception.AssociationAlreadyExists;
@@ -33,14 +33,14 @@ public class AssociationServiceUnitTest {
     @MockitoBean
     private AssociationRepository associationRepository;
 
-    private CreateArticleTypeDto createAssociationDto;
+    private CreateAssociationDto createAssociationDto;
     private AssociationDto associationDto;
     private UpdateAssociationDto updateAssociationDto;
     private AssociationEntity association;
 
     @BeforeEach()
     public void beforeEach() {
-        createAssociationDto = new CreateArticleTypeDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
+        createAssociationDto = new CreateAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         updateAssociationDto = new UpdateAssociationDto("Association1", null, null, null, null, null, null);
         association = new AssociationEntity("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "+33101010101", "Ceci est une description", Instant.now(), Instant.now());

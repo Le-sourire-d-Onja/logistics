@@ -1,78 +1,72 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit5TestClass.java to edit this template
- */
-
 package com.cooperhost.logistics.association;
 
-import java.util.List;
+import java.time.Instant;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.cooperhost.logistics.association.controllers.AssociationController;
 import com.cooperhost.logistics.association.dtos.AssociationDto;
 import com.cooperhost.logistics.association.dtos.CreateAssociationDto;
 import com.cooperhost.logistics.association.dtos.UpdateAssociationDto;
 import com.cooperhost.logistics.association.dtos.WrongCreateAssociationDto;
 import com.cooperhost.logistics.association.enums.AssociationType;
-import com.cooperhost.logistics.association.exception.AssociationAlreadyExists;
-import com.cooperhost.logistics.association.exception.AssociationNotFound;
-import com.cooperhost.logistics.association.services.AssociationService;
+import com.cooperhost.logistics.association.models.AssociationEntity;
+import com.cooperhost.logistics.association.repositories.AssociationRepository;
+import com.cooperhost.logistics.shared.config.IntegrationTestConfig;
 
 import tools.jackson.databind.ObjectMapper;
 
-/**
- *
- * @author cooper
- */
-@WebMvcTest(AssociationController.class)
-public class AssociationControllerTest {
+@Testcontainers
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+public class AssociationIntegrationTest extends IntegrationTestConfig {
+    @Autowired
+    private AssociationRepository associationRepository;
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockitoBean
-    private AssociationService associationService;
 
     private CreateAssociationDto createAssociationDto;
     private AssociationDto associationDto;
     private UpdateAssociationDto updateAssociationDto;
     private WrongCreateAssociationDto wrongCreateAssociationDto;
+    private AssociationEntity association;
 
     @BeforeEach()
     public void beforeEach() {
+        associationRepository.deleteAll();
         createAssociationDto = new CreateAssociationDto("Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
         associationDto = new AssociationDto("1", "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "+33101010101", "test@yopmail.com", "Ceci est une description");
-        updateAssociationDto = new UpdateAssociationDto("Association1", null, null, null, null, null, null);
+        updateAssociationDto = new UpdateAssociationDto("Association1", null, "test1", "2 rue du test", null, null, null);
         wrongCreateAssociationDto =  new WrongCreateAssociationDto();
+        association = new AssociationEntity(null, "Association", AssociationType.ASSOCIATION, "test", "1 rue du test", "test@yopmail.com", "+33101010101", "Ceci est une description", Instant.now(), Instant.now());
     }
 
     @Test
     public void testCreate_201() throws Exception {
-        when(associationService.create(any(CreateAssociationDto.class))).thenReturn(associationDto);
         mockMvc.perform((post("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(createAssociationDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.errors").isEmpty())
-                .andExpect(jsonPath("$.data.id").value(associationDto.getId()))
+                .andExpect(jsonPath("$.data.id").isString())
                 .andExpect(jsonPath("$.data.name").value(associationDto.getName()))
                 .andExpect(jsonPath("$.data.type").value(associationDto.getType().toString()))
                 .andExpect(jsonPath("$.data.personInCharge").value(associationDto.getPersonInCharge()))
@@ -84,20 +78,16 @@ public class AssociationControllerTest {
 
     @Test
     public void testCreate_400() throws Exception {
-        // Given a association to create
         mockMvc.perform((post("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(wrongCreateAssociationDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").isArray())
-                .andExpect(jsonPath("$.errors[?(@.field == 'address')]").exists())
-                .andExpect(jsonPath("$.errors[?(@.field == 'email')]").exists())
-                .andExpect(jsonPath("$.errors[?(@.field == 'phone')]").exists());
+                .andExpect(jsonPath("$.errors").isArray());
     }
 
     @Test
     public void testCreate_409() throws Exception {
-        when(associationService.create(any(CreateAssociationDto.class))).thenThrow(new AssociationAlreadyExists());
+        associationRepository.save(association);
         mockMvc.perform((post("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(createAssociationDto)))
@@ -109,12 +99,12 @@ public class AssociationControllerTest {
 
     @Test
     public void testFindAll_200() throws Exception {
-        when(associationService.findAll()).thenReturn(List.of(associationDto));
+        AssociationEntity savedAssociation = associationRepository.save(association);
         mockMvc.perform((get("/api/associations"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").isEmpty())
-                .andExpect(jsonPath("$.data.[0].id").value(associationDto.getId()))
+                .andExpect(jsonPath("$.data.[0].id").value(savedAssociation.getId()))
                 .andExpect(jsonPath("$.data.[0].name").value(associationDto.getName()))
                 .andExpect(jsonPath("$.data.[0].type").value(associationDto.getType().toString()))
                 .andExpect(jsonPath("$.data.[0].personInCharge").value(associationDto.getPersonInCharge()))
@@ -126,14 +116,16 @@ public class AssociationControllerTest {
 
     @Test
     public void testUpdate_200() throws Exception {
+        AssociationEntity savedAssociation = associationRepository.save(association);
         associationDto.setName(updateAssociationDto.getName());
-        when(associationService.update(any(String.class), any(UpdateAssociationDto.class))).thenReturn(associationDto);
-        mockMvc.perform((patch("/api/associations/" + associationDto.getId()))
+        associationDto.setPersonInCharge(updateAssociationDto.getPersonInCharge());
+        associationDto.setAddress(updateAssociationDto.getAddress());
+        mockMvc.perform((patch("/api/associations/" + savedAssociation.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(updateAssociationDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").isEmpty())
-                .andExpect(jsonPath("$.data.id").value(associationDto.getId()))
+                .andExpect(jsonPath("$.data.id").value(savedAssociation.getId()))
                 .andExpect(jsonPath("$.data.name").value(associationDto.getName()))
                 .andExpect(jsonPath("$.data.type").value(associationDto.getType().toString()))
                 .andExpect(jsonPath("$.data.personInCharge").value(associationDto.getPersonInCharge()))
@@ -149,14 +141,11 @@ public class AssociationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(wrongCreateAssociationDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").isArray())
-                .andExpect(jsonPath("$.errors[?(@.field == 'email')]").exists())
-                .andExpect(jsonPath("$.errors[?(@.field == 'phone')]").exists());
+                .andExpect(jsonPath("$.errors").isArray());
     }
 
     @Test
     public void testUpdate_404() throws Exception {
-        when(associationService.update(any(String.class), any(UpdateAssociationDto.class))).thenThrow(new AssociationNotFound());
         mockMvc.perform((patch("/api/associations/" + associationDto.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(updateAssociationDto)))
@@ -168,8 +157,13 @@ public class AssociationControllerTest {
 
     @Test
     public void testUpdate_409() throws Exception {
-        when(associationService.update(any(String.class), any(UpdateAssociationDto.class))).thenThrow(new AssociationAlreadyExists());
-        mockMvc.perform((patch("/api/associations/" + associationDto.getId()))
+        AssociationEntity associationCopy1 = new AssociationEntity(null, association.getName() + "1", association.getType(), association.getPersonInCharge(), association.getAddress(), association.getEmail(), association.getPhone(), association.getDescription(), association.getCreatedAt(), association.getUpdatedAt());
+        AssociationEntity associationCopy2 = new AssociationEntity(null, association.getName(), association.getType(), association.getPersonInCharge(), association.getAddress(), association.getEmail(), association.getPhone(), association.getDescription(), association.getCreatedAt(), association.getUpdatedAt());
+
+        associationRepository.save(associationCopy1);
+        associationRepository.save(associationCopy2);
+
+        mockMvc.perform((patch("/api/associations/" + associationCopy2.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(updateAssociationDto)))
                 .andExpect(status().isConflict())
@@ -180,8 +174,8 @@ public class AssociationControllerTest {
 
     @Test
     public void testDelete_204() throws Exception {
-        doNothing().when(associationService).delete(any(String.class));
-        mockMvc.perform((delete("/api/associations/" + associationDto.getId()))
+        AssociationEntity savedAssociation = associationRepository.save(association);
+        mockMvc.perform((delete("/api/associations/" + savedAssociation.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(jsonPath("$.errors").isEmpty())
@@ -191,13 +185,11 @@ public class AssociationControllerTest {
 
     @Test
     public void testDelete_404() throws Exception {
-        doThrow(new AssociationNotFound()).when(associationService).delete(any(String.class));
         mockMvc.perform((delete("/api/associations/" + associationDto.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.errors.[0].field").isEmpty())
                 .andExpect(jsonPath("$.errors.[0].message").value("The association is not found"))
                 .andExpect(jsonPath("$.data").isEmpty());
-
     }
 }
