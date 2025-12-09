@@ -25,6 +25,7 @@ import com.cooperhost.logistics.article_type.services.ArticleTypeService;
 
 @WebMvcTest(ArticleTypeService.class)
 public class ArticleTypeServiceUnitTest {
+
     @Autowired
     private ArticleTypeService articleTypeService;
 

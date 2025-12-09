@@ -1,22 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit5TestClass.java to edit this template
- */
-
 package com.cooperhost.logistics.article_type;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,53 +16,54 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.cooperhost.logistics.article_type.controllers.ArticleTypeController;
 import com.cooperhost.logistics.article_type.dtos.ArticleTypeDto;
 import com.cooperhost.logistics.article_type.dtos.CreateArticleTypeDto;
 import com.cooperhost.logistics.article_type.dtos.UpdateArticleTypeDto;
 import com.cooperhost.logistics.article_type.dtos.WrongCreateArticleTypeDto;
-import com.cooperhost.logistics.article_type.exception.ArticleTypeAlreadyExists;
-import com.cooperhost.logistics.article_type.exception.ArticleTypeNotFound;
-import com.cooperhost.logistics.article_type.services.ArticleTypeService;
+import com.cooperhost.logistics.article_type.models.ArticleTypeEntity;
+import com.cooperhost.logistics.article_type.repositories.ArticleTypeRepository;
+import com.cooperhost.logistics.shared.config.IntegrationTestConfig;
 
 import tools.jackson.databind.ObjectMapper;
 
-/**
- *
- * @author cooper
- */
-@WebMvcTest(ArticleTypeController.class)
-public class ArticleTypeControllerTest {
+@Testcontainers
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+public class ArticleTypeIntegrationTest extends IntegrationTestConfig {
+    @Autowired
+    private ArticleTypeRepository articleTypeRepository;
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockitoBean
-    private ArticleTypeService articleTypeService;
 
     private CreateArticleTypeDto createArticleTypeDto;
     private ArticleTypeDto articleTypeDto;
     private UpdateArticleTypeDto updateArticleTypeDto;
     private WrongCreateArticleTypeDto wrongCreateArticleTypeDto;
+    private ArticleTypeEntity articleType;
 
     @BeforeEach()
     public void beforeEach() {
+        articleTypeRepository.deleteAll();
         createArticleTypeDto = new CreateArticleTypeDto("ArticleType", 10f, 10f);
         articleTypeDto = new ArticleTypeDto("1", "ArticleType", 10f, 10f);
         updateArticleTypeDto = new UpdateArticleTypeDto("ArticleType1", null, null);
         wrongCreateArticleTypeDto =  new WrongCreateArticleTypeDto();
+        articleType = new ArticleTypeEntity(null, "ArticleType", 10f, 10f);
     }
 
     @Test
     public void testCreate_201() throws Exception {
-        when(articleTypeService.create(any(CreateArticleTypeDto.class))).thenReturn(articleTypeDto);
         mockMvc.perform((post("/api/article-types"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(createArticleTypeDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.errors").isEmpty())
-                .andExpect(jsonPath("$.data.id").value(articleTypeDto.getId()))
+                .andExpect(jsonPath("$.data.id").isString())
                 .andExpect(jsonPath("$.data.name").value(articleTypeDto.getName()))
                 .andExpect(jsonPath("$.data.weight").value(articleTypeDto.getWeight()))
                 .andExpect(jsonPath("$.data.volume").value(articleTypeDto.getVolume()));
@@ -78,7 +71,6 @@ public class ArticleTypeControllerTest {
 
     @Test
     public void testCreate_400() throws Exception {
-        // Given a articleType to create
         mockMvc.perform((post("/api/article-types"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(wrongCreateArticleTypeDto)))
@@ -88,7 +80,7 @@ public class ArticleTypeControllerTest {
 
     @Test
     public void testCreate_409() throws Exception {
-        when(articleTypeService.create(any(CreateArticleTypeDto.class))).thenThrow(new ArticleTypeAlreadyExists());
+        articleTypeRepository.save(articleType);
         mockMvc.perform((post("/api/article-types"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(createArticleTypeDto)))
@@ -100,12 +92,12 @@ public class ArticleTypeControllerTest {
 
     @Test
     public void testFindAll_200() throws Exception {
-        when(articleTypeService.findAll()).thenReturn(List.of(articleTypeDto));
+        articleTypeRepository.save(articleType);
         mockMvc.perform((get("/api/article-types"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").isEmpty())
-                .andExpect(jsonPath("$.data.[0].id").value(articleTypeDto.getId()))
+                .andExpect(jsonPath("$.data.[0].id").isString())
                 .andExpect(jsonPath("$.data.[0].name").value(articleTypeDto.getName()))
                 .andExpect(jsonPath("$.data.[0].weight").value(articleTypeDto.getWeight()))
                 .andExpect(jsonPath("$.data.[0].volume").value(articleTypeDto.getVolume()));
@@ -113,14 +105,14 @@ public class ArticleTypeControllerTest {
 
     @Test
     public void testUpdate_200() throws Exception {
+        ArticleTypeEntity savedArticleType = articleTypeRepository.save(articleType);
         articleTypeDto.setName(updateArticleTypeDto.getName());
-        when(articleTypeService.update(any(String.class), any(UpdateArticleTypeDto.class))).thenReturn(articleTypeDto);
-        mockMvc.perform((patch("/api/article-types/" + articleTypeDto.getId()))
+        mockMvc.perform((patch("/api/article-types/" + savedArticleType.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(updateArticleTypeDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").isEmpty())
-                .andExpect(jsonPath("$.data.id").value(articleTypeDto.getId()))
+                .andExpect(jsonPath("$.data.id").value(savedArticleType.getId()))
                 .andExpect(jsonPath("$.data.name").value(articleTypeDto.getName()))
                 .andExpect(jsonPath("$.data.weight").value(articleTypeDto.getWeight()))
                 .andExpect(jsonPath("$.data.volume").value(articleTypeDto.getVolume()));
@@ -137,7 +129,6 @@ public class ArticleTypeControllerTest {
 
     @Test
     public void testUpdate_404() throws Exception {
-        when(articleTypeService.update(any(String.class), any(UpdateArticleTypeDto.class))).thenThrow(new ArticleTypeNotFound());
         mockMvc.perform((patch("/api/article-types/" + articleTypeDto.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(updateArticleTypeDto)))
@@ -149,8 +140,13 @@ public class ArticleTypeControllerTest {
 
     @Test
     public void testUpdate_409() throws Exception {
-        when(articleTypeService.update(any(String.class), any(UpdateArticleTypeDto.class))).thenThrow(new ArticleTypeAlreadyExists());
-        mockMvc.perform((patch("/api/article-types/" + articleTypeDto.getId()))
+        ArticleTypeEntity articleTypeCopy1 = new ArticleTypeEntity(null, articleType.getName() + "1", articleType.getWeight(), articleType.getVolume());
+        ArticleTypeEntity articleTypeCopy2 = new ArticleTypeEntity(null, articleType.getName(), articleType.getWeight(), articleType.getVolume());
+
+        articleTypeRepository.save(articleTypeCopy1);
+        articleTypeRepository.save(articleTypeCopy2);
+
+        mockMvc.perform((patch("/api/article-types/" + articleTypeCopy2.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(updateArticleTypeDto)))
                 .andExpect(status().isConflict())
@@ -161,8 +157,8 @@ public class ArticleTypeControllerTest {
 
     @Test
     public void testDelete_204() throws Exception {
-        doNothing().when(articleTypeService).delete(any(String.class));
-        mockMvc.perform((delete("/api/article-types/" + articleTypeDto.getId()))
+        ArticleTypeEntity savedArticleType = articleTypeRepository.save(articleType);
+        mockMvc.perform((delete("/api/article-types/" + savedArticleType.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(jsonPath("$.errors").isEmpty())
@@ -172,7 +168,6 @@ public class ArticleTypeControllerTest {
 
     @Test
     public void testDelete_404() throws Exception {
-        doThrow(new ArticleTypeNotFound()).when(articleTypeService).delete(any(String.class));
         mockMvc.perform((delete("/api/article-types/" + articleTypeDto.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())

@@ -11,10 +11,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cooperhost.logistics.article_type.exception.ArticleTypeAlreadyExists;
 import com.cooperhost.logistics.article_type.dtos.ArticleTypeDto;
 import com.cooperhost.logistics.article_type.dtos.CreateArticleTypeDto;
 import com.cooperhost.logistics.article_type.dtos.UpdateArticleTypeDto;
+import com.cooperhost.logistics.article_type.exception.ArticleTypeAlreadyExists;
 import com.cooperhost.logistics.article_type.exception.ArticleTypeNotFound;
 import com.cooperhost.logistics.article_type.models.ArticleTypeEntity;
 import com.cooperhost.logistics.article_type.repositories.ArticleTypeRepository;
@@ -53,7 +53,7 @@ public class ArticleTypeService {
   public ArticleTypeDto update(String id, UpdateArticleTypeDto updateArticleTypeDto) throws ArticleTypeNotFound {
     ArticleTypeEntity existing = articleTypeRepository.findById(id)
       .orElseThrow(ArticleTypeNotFound::new);
-    if (articleTypeRepository.existsByName(id)) {
+    if (articleTypeRepository.existsByName(updateArticleTypeDto.getName())) {
       throw new ArticleTypeAlreadyExists();
     }
     this.modelMapper.map(updateArticleTypeDto, existing);
